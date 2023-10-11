@@ -153,10 +153,11 @@ pub fn print_log_contents(path: Arc<PathBuf>, search_words: Arc<Vec<String>>, st
         }
         if is_bounty_in_stats {
             if !was_bounty_last_printed {
-                let num = format!("{}", total_bounty);
+                let num = format!("{}", total_bounty.to_string());
+                let thing = format!("{}", add_commas(&num));
                 print_fancy(&[
                     ("Total Bounty: ", CYAN, vec![]),
-                    (&num, GREEN, vec![BOLD]),
+                    (&thing, GREEN, vec![BOLD]),
                     (" ISK", CYAN, vec![]),
                 ], NewLine);
                 was_bounty_last_printed = true;
@@ -165,4 +166,11 @@ pub fn print_log_contents(path: Arc<PathBuf>, search_words: Arc<Vec<String>>, st
         let _last_pos = file.metadata().map(|m| m.len() as u64).unwrap_or(last_pos);
         thread::sleep(Duration::from_secs(1));
     }
+}
+
+fn add_commas(s: &str) -> String {
+    let re = Regex::new(r"(\d{3})").unwrap();
+    let reversed_string = s.chars().rev().collect::<String>();
+    let reversed_with_commas = re.replace_all(&reversed_string, "$1,");
+    reversed_with_commas.chars().rev().collect::<String>().trim_start_matches(',').to_string()
 }
