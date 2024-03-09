@@ -2,9 +2,7 @@ use std::fs::{self, File, read_dir, metadata};
 use std::io::{self, BufRead, BufReader, SeekFrom, Seek, Write};
 use std::thread;
 use std::time::Duration;
-use std::sync::Arc;
 use std::path::PathBuf;
-use toml;
 use serde::Deserialize;
 use regex::Regex;
 use solarized::{
@@ -40,8 +38,7 @@ pub fn find_most_recent_log_file(dir_path: &PathBuf) -> io::Result<PathBuf> {
         if let Some(ext) = path.extension() {
             if ext == "txt" {
                 let modified_time = metadata(&path)?.modified()?;
-                log_files.push((path, modified_time));
-            }
+                log_files.push((path, modified_time)); }
         }
     }
     log_files.sort_by(|a, b| b.1.cmp(&a.1));
@@ -50,23 +47,7 @@ pub fn find_most_recent_log_file(dir_path: &PathBuf) -> io::Result<PathBuf> {
         .ok_or(io::Error::new(io::ErrorKind::NotFound, "No log files found"))
 }
 
-/*
-ESC in ASCII - Start of escape sequence
-\x1B
-Moves cursor up by 1 line
-[ indicates beginning of command
-1A instructs terminal to move cursor up one line
-[1A
-ESC again
-\x1B
-escape character that clears line from current cursor position to end of line
-cursor should be at beginning of line after [1A
-[K
-print!("\x1B[1A\x1B[K");
-println!("Total Bounty: {} ISK", total_bounty);
-*/
-
-pub fn print_log_contents(path: Arc<PathBuf>, search_words: Arc<Vec<String>>, stats: Arc<Vec<String>>) {
+pub fn print_log_contents(path: &PathBuf, search_words: &Vec<String>, stats: &Vec<String>) {
     let re = Regex::new(r"<.*?>").unwrap();
     let bounty_re = Regex::new(r"\b(\d+),?(\d+)?,?(\d+)? ISK\b").unwrap();
     let mut reader = BufReader::new(File::open(&*path).unwrap());

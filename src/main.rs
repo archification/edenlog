@@ -8,7 +8,8 @@ use solarized::{
 use stuff::{read_config, print_log_contents};
 use std::sync::Arc;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     clear();
     print_colored(
         &["Welcome ", "to ", "the ", "Eve ", "log ", "parser ", "of ", "doom."],
@@ -21,6 +22,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let path = Arc::new(most_recent_file_path);
     let search_words = Arc::new(search_words);
     let stats = Arc::new(stats);
-    print_log_contents(path, search_words, stats);
+    print_log_contents(&path, &search_words, &stats);
     Ok(())
 }
